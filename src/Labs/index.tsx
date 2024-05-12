@@ -7,14 +7,16 @@ import Lab3 from "./Lab3";
 export default function Labs() {
     return (
         <div>
+            <h1>Songbo Gao - CS5610 41239 Web Development SEC 01</h1>
             <h1>Labs</h1>
-            <TOC />
+            <TOC/>
             <Routes>
-                <Route path="/" element={<Navigate to="Lab1" />} />
-                <Route path="Lab1" element={<Lab1 />} />
-                <Route path="Lab2" element={<Lab2 />} />
-                <Route path="Lab3" element={<Lab3 />} />
+                <Route path="/" element={<Navigate to="Lab1"/>}/>
+                <Route path="Lab1" element={<Lab1/>}/>
+                <Route path="Lab2" element={<Lab2/>}/>
+                <Route path="Lab3" element={<Lab3/>}/>
             </Routes>
+            <a href="https://github.com/songbo327/kanbas-react-web-app/tree/a1">Github</a>
         </div>
     );
 }
