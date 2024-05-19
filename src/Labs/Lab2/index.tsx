@@ -297,7 +297,7 @@ export default function Lab2() {
                 </div>
             </div>
 
-            <ReactIconsSampler />
+            <ReactIconsSampler/>
 
             <h2>Bootstrap</h2>
             <div id="wd-bs-grid-system">
@@ -721,7 +721,7 @@ export default function Lab2() {
                 <div className="card"
                      style={{width: "18rem"}}>
                     <img src="images/stacked.jpg"
-                         className="card-img-top"/>
+                         className="card-img-top" alt="stacked"/>
                     <div className="card-body">
                         <h5 className="card-title">
                             Stacking Starship

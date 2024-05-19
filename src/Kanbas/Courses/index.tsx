@@ -1,7 +1,7 @@
 import CoursesNavigation from "./Navigation";
 import Modules from "./Modules";
 import Home from "./Home";
-import {Navigate, Route, Routes} from "react-router";
+import {Route, Routes} from "react-router";
 import Assignments from "./Assignments"
 import AssignmentEditor from "./Assignments/Editor";
 import Grades from "./Grades";
