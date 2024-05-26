@@ -2,12 +2,33 @@ import React from "react";
 import {BsFillGearFill, BsFunnel} from "react-icons/bs";
 import {BiImport} from "react-icons/bi";
 import {LiaFileImportSolid} from "react-icons/lia";
+import {assignments, enrollments, grades, users} from "../../Database"
+import {useParams} from "react-router";
 
 export default function Grades() {
+    const {cid} = useParams();
+
+    const student_ids = enrollments.filter((enrollment) => enrollment.course === cid);
+
+    const students = student_ids.map((student_id) => users.find((user) => user._id === student_id.user));
+
+    const assignments_list = assignments.filter((assignment) => assignment.course === cid);
+
+    const grades_list = students.map((student) => {
+        const student_grades = assignments_list.map((assignment) => {
+            const grade = grades.find((grade) => grade.assignment === assignment._id && grade.student === student?._id);
+            return grade ? grade.grade : "N/A"
+        });
+        return {
+            ...student,
+            grades: student_grades
+        }
+    });
+
     return (
         <div className="container">
             <button className="btn btn-secondary float-end">
-                <BsFillGearFill  className="fs-5"/>
+                <BsFillGearFill className="fs-5"/>
             </button>
             <button className="btn btn-secondary float-end mx-2 dropdown-toggle">
                 <BiImport className="me-2 fs-5"/>
@@ -44,79 +65,29 @@ export default function Grades() {
                         <thead>
                         <tr>
                             <th scope="col" className="fs-6 fw-normal" style={{width: "20%"}}>Student Name</th>
-                            <th scope="col" className="fs-6 fw-normal text-center" style={{width: "20%"}}>
-                                A1 SETUP<br/>
-                                Out of 100
-                            </th>
-                            <th scope="col" className="fs-6 fw-normal text-center" style={{width: "20%"}}>
-                                A2 HTML<br/>
-                                Out of 100
-                            </th>
-                            <th scope="col" className="fs-6 fw-normal text-center" style={{width: "20%"}}>
-                                A3 CSS<br/>
-                                Out of 100
-                            </th>
-                            <th scope="col" className="fs-6 fw-normal text-center" style={{width: "20%"}}>
-                                A4 BOOTSTRAP<br/>
-                                Out of 100
-                            </th>
+                            {
+                                assignments_list && assignments_list.map((assignment) => (
+                                    <th scope="col" className="fs-6 fw-normal text-center" style={{width: "20%"}}>
+                                        {assignment.title}<br/>
+                                        Out of {assignment.points}
+                                    </th>
+                                ))
+                            }
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <th scope="row" className="text-danger">Jane Adams</th>
-                            <td className="text-center">100%</td>
-                            <td className="text-center">100%</td>
-                            <td className="text-center">
-                                <input type="percentile" value="100%" className="form-control text-center"/>
-                            </td>
-                            <td className="text-center">100%</td>
-                        </tr>
-                        <tr>
-                            <th scope="row" className="text-danger">Christina Allen</th>
-                            <td className="text-center">100%</td>
-                            <td className="text-center">100%</td>
-                            <td className="text-center">
-                                <input type="percentile" value="100%" className="form-control text-center"/>
-                            </td>
-                            <td className="text-center">100%</td>
-                        </tr>
-                        <tr>
-                            <th scope="row" className="text-danger">Samreen Ansari</th>
-                            <td className="text-center">100%</td>
-                            <td className="text-center">100%</td>
-                            <td className="text-center">
-                                <input type="percentile" value="100%" className="form-control text-center"/>
-                            </td>
-                            <td className="text-center">100%</td>
-                        </tr>
-                        <tr>
-                            <th scope="row" className="text-danger">Han Bao</th>
-                            <td className="text-center">100%</td>
-                            <td className="text-center">100%</td>
-                            <td className="text-center">
-                                <input type="percentile" value="100%" className="form-control text-center"/>
-                            </td>
-                            <td className="text-center">100%</td>
-                        </tr>
-                        <tr>
-                            <th scope="row" className="text-danger">Mahi Sai Srinivas Bobbili</th>
-                            <td className="text-center">100%</td>
-                            <td className="text-center">100%</td>
-                            <td className="text-center">
-                                <input type="percentile" value="100%" className="form-control text-center"/>
-                            </td>
-                            <td className="text-center">100%</td>
-                        </tr>
-                        <tr>
-                            <th scope="row" className="text-danger">Siran Cao</th>
-                            <td className="text-center">100%</td>
-                            <td className="text-center">100%</td>
-                            <td className="text-center">
-                                <input type="percentile" value="100%" className="form-control text-center"/>
-                            </td>
-                            <td className="text-center">100%</td>
-                        </tr>
+                        {
+                            grades_list && grades_list.map((student) => (
+                                <tr>
+                                    <th scope="row" className="text-danger">{student.firstName + " " + student.lastName}</th>
+                                    {
+                                        student.grades && student.grades.map((grade) => (
+                                            <td className="text-center">{grade}</td>
+                                        ))
+                                    }
+                                </tr>
+                            ))
+                        }
                         </tbody>
                     </table>
                 </div>
