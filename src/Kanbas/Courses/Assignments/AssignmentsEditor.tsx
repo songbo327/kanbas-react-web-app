@@ -1,24 +1,50 @@
-import {useLocation, useParams} from "react-router";
-import {assignments} from "../../Database";
+import {useLocation, useNavigate, useParams} from "react-router";
 import {Link} from "react-router-dom";
+import {useState} from "react";
+import {useDispatch, useSelector} from "react-redux";
+import {updateAssignment} from "./reducer";
 
-export default function AssignmentEditor() {
+export default function AssignmentsEditor() {
     const {cid} = useParams();
     const {pathname} = useLocation();
+    const dispatch = useDispatch();
+    const router = useNavigate();
 
     const aid = pathname.split("/").pop();
-    const assignment = assignments.find(a => a._id === aid);
+    // const assignment = assignments.find(a => a._id === aid);
+
+    const {assignments} = useSelector((state: any) => state.assignmentsReducer);
+    const curAssignment = assignments.find((item: any) => item._id === aid);
+    console.log(curAssignment)
+
+    const [assignment, setAssignment] = useState({
+        ...curAssignment
+    });
+
+    // setAssignment({...curAssignment})
+
+    const handleChange = (e: any) => {
+        const value = e.target.value;
+        setAssignment({...assignment, [e.target.name]: value});
+    };
+
+    const handleUpdateAssignment = () => {
+        dispatch(updateAssignment(assignment));
+        router(`/Kanbas/Courses/${cid}/Assignments`);
+    }
 
     return (
         <div id="wd-assignments-editor">
             <div className="container">
                 <div className="row input-group mb-2">
                     <label htmlFor="wd-name" className="form-label">Assignment Name</label>
-                    <input id="wd-name" className="form-control" value={assignment?.title}/>
+                    <input id="wd-name" className="form-control" name="title" value={assignment?.title}
+                           onChange={handleChange}/>
                 </div>
 
                 <div className="row input-group mb-2">
-                      <textarea id="wd-description" className="form-control" rows={10} cols={60}>
+                      <textarea id="wd-description" className="form-control" rows={10} cols={60} name="description"
+                                onChange={handleChange}>
                             {assignment?.description}
                         </textarea>
                 </div>
@@ -28,7 +54,8 @@ export default function AssignmentEditor() {
                         <label htmlFor="wd-points" className="col-form-label float-end">Points</label>
                     </div>
                     <div className="col">
-                        <input id="wd-points" type="number" className="form-control" value={assignment?.points}/>
+                        <input id="wd-points" type="number" className="form-control" name="points"
+                               onChange={handleChange} value={assignment?.points}/>
                     </div>
                 </div>
 
@@ -114,25 +141,28 @@ export default function AssignmentEditor() {
                     <div className="col">
                         <div className="card">
                             <div className="card-body">
-                                <div className="row">
-                                    <label htmlFor="wd-assign-to" className="form-label"><b>Assign to</b></label>
-                                    <div className="input-group">
-                                        <button className="btn btn-light" style={{padding: '5px 10px'}}>Every one X</button>
-                                        <input id="wd-assign-to" type="text" className="form-control"/>
-                                    </div>
-                                </div>
+                                {/*<div className="row">*/}
+                                {/*    <label htmlFor="wd-assign-to" className="form-label"><b>Assign to</b></label>*/}
+                                {/*    <div className="input-group">*/}
+                                {/*        <button className="btn btn-light" style={{padding: '5px 10px'}}>Every one X</button>*/}
+                                {/*        <input id="wd-assign-to" type="text" className="form-control"/>*/}
+                                {/*    </div>*/}
+                                {/*</div>*/}
                                 <div className="row mt-4">
                                     <label htmlFor="wd-due-date"><b>Due</b></label>
-                                    <input id="wd-due-date" type="date" className="form-control" value={assignment?.due}/>
+                                    <input id="wd-due-date" type="date" className="form-control"
+                                           value={assignment?.due} onChange={handleChange} name="due"/>
                                 </div>
                                 <div className="row my-2">
                                     <div className="col">
                                         <label htmlFor="wd-available-from"><b>Available from</b></label>
-                                        <input id="wd-available-from" type="date" className="form-control" value={assignment?.available}/>
+                                        <input id="wd-available-from" type="date" className="form-control"
+                                               value={assignment?.available} onChange={handleChange} name="available"/>
                                     </div>
                                     <div className="col">
                                         <label htmlFor="wd-available-until"><b>Until</b></label>
-                                        <input id="wd-available-until" type="date" className="form-control" value=""/>
+                                        <input id="wd-available-until" type="date" className="form-control"
+                                               onChange={handleChange} name="until" value={assignment?.until}/>
                                     </div>
                                 </div>
                             </div>
@@ -144,11 +174,8 @@ export default function AssignmentEditor() {
                 </div>
 
                 <div className="mb-2">
-
-
-                    <Link key={'save'} to={`/Kanbas/Courses/${cid}/Assignments`}>
-                        <input type="button" className="btn btn-danger float-end ms-2" value="Save"/>
-                    </Link>
+                    <input type="button" className="btn btn-danger float-end ms-2" value="Save"
+                           onClick={handleUpdateAssignment}/>
                     <Link key={'cancel'} to={`/Kanbas/Courses/${cid}/Assignments`}>
                         <input type="button" className="btn btn-secondary float-end" value="Cancel"/>
                     </Link>
