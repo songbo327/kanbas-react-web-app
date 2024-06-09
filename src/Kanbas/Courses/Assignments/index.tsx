@@ -4,15 +4,34 @@ import AssignmentControlButtons from "./AssignmentControlButtons";
 import {BiCaretDown, BiEdit} from "react-icons/bi";
 import LessonControlButtons from "./LessionControlButtons";
 import {useParams} from "react-router";
-import {deleteAssignment} from "./reducer";
+import {addAssignment, deleteAssignment, setAssignments, updateAssignment} from "./reducer";
 import {useSelector, useDispatch} from "react-redux";
+import * as client from "./client";
+import {useEffect} from "react";
 
 export default function Assignments() {
     const {cid} = useParams();
+
     const {assignments} = useSelector((state: any) => state.assignmentsReducer);
-    console.log(assignments)
     const cidAssignments = assignments.filter((assignment: any) => assignment.course === cid);
     const dispatch = useDispatch();
+
+    // console.log(assignments)
+
+    useEffect(() => {
+        fetchAssignments();
+    }, []);
+
+    const fetchAssignments = async () => {
+        const assignments = await client.findAssignmentsForCourse(cid as string);
+        dispatch(setAssignments(assignments));
+    };
+
+
+    const removeAssignment = async (moduleId: string) => {
+        await client.deleteAssignment(moduleId);
+        dispatch(deleteAssignment(moduleId));
+    };
 
     return (
         <div id="wd-assignments">
@@ -42,17 +61,18 @@ export default function Assignments() {
                                 <div className="col">
                                     <a className="wd-assignment-link text-dark link-underline link-underline-opacity-0"
                                        href={`#/Kanbas/Courses/${cid}/Assignments/${item._id}`}>
-                                    <h5><b>{item.title}</b></h5>
+                                        <h5><b>{item.title}</b></h5>
                                     </a>
                                     <p>
                                         <span className="text-danger"> Multiple Modules </span>
-                                        | <b>Available from</b> {item.available} | <b>Until</b> {item.until} | <b>Due</b> {item.due} | {item.points} pts
+                                        | <b>Available
+                                        from</b> {item.available} | <b>Until</b> {item.until} | <b>Due</b> {item.due} | {item.points} pts
                                     </p>
                                 </div>
                                 <div className="col float-end">
                                     <LessonControlButtons assignmentId={item._id}
                                                           deleteAssignment={(assignmentId) => {
-                                                              dispatch(deleteAssignment(assignmentId));
+                                                              removeAssignment(assignmentId)
                                                           }}/>
                                 </div>
                             </div>

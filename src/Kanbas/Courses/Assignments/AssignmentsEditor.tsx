@@ -3,6 +3,7 @@ import {Link} from "react-router-dom";
 import {useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {updateAssignment} from "./reducer";
+import * as client from "./client";
 
 export default function AssignmentsEditor() {
     const {cid} = useParams();
@@ -28,9 +29,14 @@ export default function AssignmentsEditor() {
         setAssignment({...assignment, [e.target.name]: value});
     };
 
-    const handleUpdateAssignment = () => {
+    const saveModule = async (assignment: any) => {
+        const status = await client.updateAssignment(assignment);
         dispatch(updateAssignment(assignment));
         router(`/Kanbas/Courses/${cid}/Assignments`);
+    };
+
+    const handleUpdateAssignment = () => {
+        saveModule(assignment)
     }
 
     return (

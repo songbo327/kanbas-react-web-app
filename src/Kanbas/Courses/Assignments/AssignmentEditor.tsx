@@ -2,7 +2,8 @@ import {useLocation, useNavigate, useParams} from "react-router";
 import {Link} from "react-router-dom";
 import {useState} from "react";
 import {useDispatch} from "react-redux";
-import {addAssignment} from "./reducer";
+import {addAssignment, updateAssignment} from "./reducer";
+import * as client from "./client";
 
 export default function AssignmentEditor() {
 
@@ -30,9 +31,14 @@ export default function AssignmentEditor() {
         setAssignment({...assignment, [e.target.name]: value});
     };
 
-    const handleAddAssignment = () => {
-        dispatch(addAssignment(assignment));
+    const createAssignment = async (assignment: any) => {
+        const newModule = await client.createAssignment(cid as string, assignment);
+        dispatch(addAssignment(newModule));
         router(`/Kanbas/Courses/${cid}/Assignments`);
+    };
+
+    const handleAddAssignment = () => {
+        createAssignment(assignment);
     }
 
     return (
