@@ -23,6 +23,7 @@ export default function Modules() {
     const createModule = async (module: any) => {
         const newModule = await client.createModule(cid as string, module);
         dispatch(addModule(newModule));
+        await fetchModules(); // reload data
     };
 
     const removeModule = async (moduleId: string) => {

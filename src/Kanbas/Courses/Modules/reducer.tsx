@@ -17,6 +17,7 @@ const modulesSlice = createSlice({
             const newModule: any = {
                 // _id: new Date().getTime().toString(),
                 lessons: [],
+                _id: module._id,
                 name: module.name,
                 course: module.course,
             };
