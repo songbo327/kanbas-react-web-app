@@ -9,6 +9,11 @@ import {FaAlignJustify} from "react-icons/fa";
 import AssignmentsEditor from "./Assignments/AssignmentsEditor";
 import AssignmentEditor from "./Assignments/AssignmentEditor";
 import PeopleTable from "./People/Table";
+import Quizzes from "./Quizzes";
+import QuizzesEditor from "./Quizzes/QuizzesEditor";
+import QuizzesDetail from "./Quizzes/QuizzesDetail";
+import QuizzesPreview from "./Quizzes/QuizzesPreview";
+
 
 export default function Courses({courses}: { courses: any[]; }) {
     const {cid} = useParams();
@@ -33,7 +38,12 @@ export default function Courses({courses}: { courses: any[]; }) {
                         <Route path="Modules" element={<Modules/>}/>
                         <Route path="Assignments" element={<Assignments/>}/>
                         <Route path="Assignments/add" element={<AssignmentEditor/>}/>
-                        <Route path="Assignments/:id" element={<AssignmentsEditor/>}/>
+                        <Route path="Assignments/:aid" element={<AssignmentsEditor/>}/>
+                        <Route path="Quizzes" element={<Quizzes/>}/>
+                        <Route path="Quizzes/add" element={<QuizzesEditor/>}/>
+                        <Route path="Quizzes/Detail/:qid" element={<QuizzesDetail/>}/>
+                        <Route path="Quizzes/Edit/:qid" element={<QuizzesEditor/>}/>
+                        <Route path="Quizzes/Preview/:qid" element={<QuizzesPreview/>}/>
                         <Route path="Grades" element={<Grades/>}/>
                         <Route path="People" element={<PeopleTable />} />
                         <Route path="People/:uid" element={<PeopleTable />} />

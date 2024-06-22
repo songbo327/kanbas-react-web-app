@@ -1,4 +1,4 @@
-import {useState} from "react";
+import React, {useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
 import * as client from "./client";
 import {useDispatch} from "react-redux";
@@ -30,6 +30,7 @@ export default function Signin() {
                    value={credentials.username} className="form-control mb-2" placeholder="username"/>
             <input onChange={(e) => setCredentials({...credentials, password: e.target.value})}
                    value={credentials.password} className="form-control mb-2" placeholder="password" type="password"/>
+            <br/>
             <button onClick={signin} className="btn btn-primary w-100"> Sign in</button>
             <br/>
             <Link to="/Kanbas/Account/Signup">Sign up</Link>

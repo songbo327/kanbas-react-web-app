@@ -1,45 +1,75 @@
 import {Link} from "react-router-dom";
-import * as db from "../Database";
-import {useState} from "react";
+import React, {useEffect, useState} from "react";
+import * as course_api from "../Courses/client";
+import * as client from "./client";
 
-export default function Dashboard(
-    {
-        courses, course, setCourse, addNewCourse,
-        deleteCourse, updateCourse
-    }: {
-        courses: any[]; course: any; setCourse: (course: any) => void;
-        addNewCourse: () => void; deleteCourse: (course: any) => void;
-        updateCourse: () => void;
-    }) {
+export default function MyCourses() {
+    const [course, setCourse] = useState<any>({});
+    const [courses, setCourses] = useState<any[]>([]);
+    const [enrollCourses, setEnrollCourses] = useState<any[]>([]);
+
+    useEffect(() => {
+        fetchAllCourses();
+        fetchEnrollCourses();
+    }, []);
+
+    const fetchAllCourses = async () => {
+        const courses = await course_api.fetchAllCourses();
+        setCourses(courses);
+        if (courses.length > 0) {
+            setCourse(courses[0]);
+        }
+    }
+
+    const fetchEnrollCourses = async () => {
+        const enrollCourses = await client.fetchEnrollCourses();
+        setEnrollCourses(enrollCourses);
+    }
+
+    const addNewCourse = async () => {
+        if (!course._id) {
+            return;
+        }
+        await client.createCourse({course: course._id});
+        fetchEnrollCourses();
+    };
+
+    const deleteCourse = async (courseId: string) => {
+        await client.deleteCourse(courseId);
+        fetchEnrollCourses();
+    };
+
+    const handleChangeCourse = (e: any) => {
+        const courseId = e.target.value;
+        const course = courses.find((course) => course._id === courseId);
+        setCourse(course);
+    };
 
     return (
         <div id="wd-dashboard">
-            <h1 id="wd-dashboard-title">Dashboard</h1>
+            <h1 id="wd-dashboard-title">MyCourses</h1>
             <hr/>
-            <h5>New Course
+            <h5>Enroll Course
                 <button className="btn btn-primary float-end"
                         id="wd-add-new-course-click"
                         onClick={addNewCourse}> Add </button>
-                <button className="btn btn-warning float-end me-2"
-                        onClick={updateCourse} id="wd-update-course-click">
-                    Update
-                </button>
                 <br/>
-                <input value={course.name} className="form-control mb-2"
-                       onChange={(e) => setCourse({...course, name: e.target.value})}/>
-                <textarea value={course.description} className="form-control"
-                          onChange={(e) => setCourse({...course, description: e.target.value})}/>
+                <select className="form-select" value={course._id} onChange={handleChangeCourse}>
+                    {courses.map((course) => (
+                        <option value={course._id}>{course.name}</option>
+                    ))}
+                </select>
 
+                <textarea value={course.description} readOnly={true} className="form-control" rows={5}/>
                 <hr/>
-
             </h5>
             <hr/>
-            <h2 id="wd-dashboard-published">Published Courses ({courses.length})</h2>
+            <h2 id="wd-dashboard-published">Enrolled Courses ({enrollCourses.length})</h2>
             <hr/>
             <div id="wd-dashboard-courses" className="row">
                 <div className="row row-cols-1 row-cols-md-5 g-4">
-                    {courses.map((course) => (
-                        <div className="wd-dashboard-course col" key={course._id} style={{width: "300px"}}>
+                    {enrollCourses.map(({_id, course}) => (
+                        <div className="wd-dashboard-course col" style={{width: "300px"}}>
                             <Link to={`/Kanbas/Courses/${course._id}/Home`} className="text-decoration-none">
                                 <div className="card rounded-3 overflow-hidden">
                                     <img src={course.cover} height="160" width="100%"/>
@@ -57,19 +87,10 @@ export default function Dashboard(
 
                                         <button onClick={(event) => {
                                             event.preventDefault();
-                                            deleteCourse(course._id);
+                                            deleteCourse(_id);
                                         }} className="btn btn-danger float-end"
                                                 id="wd-delete-course-click">
                                             Delete
-                                        </button>
-
-                                        <button id="wd-edit-course-click"
-                                                onClick={(event) => {
-                                                    event.preventDefault();
-                                                    setCourse(course);
-                                                }}
-                                                className="btn btn-warning me-2 float-end">
-                                            Edit
                                         </button>
                                     </div>
                                 </div>
