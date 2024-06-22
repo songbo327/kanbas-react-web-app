@@ -73,10 +73,17 @@ export default function QuizzesDetail() {
                             )
                         }
 
-                        <Link id="wd-preview-quizzes-btn" to={`/Kanbas/Courses/${cid}/Quizzes/Preview/${quizzesId}`}
-                              className="btn btn-lg me-1 btn-secondary float-end">
-                            Start Quiz
-                        </Link>
+                        {
+                            currentUser && currentUser.role === "STUDENT" && (
+                                <>
+                                    <Link id="wd-preview-quizzes-btn"
+                                          to={`/Kanbas/Courses/${cid}/Quizzes/Preview/${quizzesId}`}
+                                          className="btn btn-lg me-1 btn-secondary float-end">
+                                        Start Quiz
+                                    </Link>
+                                </>
+                            )
+                        }
                     </div>
                 </div>
 

@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {useLocation, useParams} from "react-router";
 import * as client from "./client";
 
-export default function QuestionEditor({closeEdit, questionData,reloadData}: {
+export default function QuestionEditor({closeEdit, questionData, reloadData}: {
     closeEdit: () => void;
     questionData: any;
     reloadData: () => void;
@@ -42,6 +42,7 @@ export default function QuestionEditor({closeEdit, questionData,reloadData}: {
         } else {
             await client.createQuestion(qid as string, question);
         }
+        closeEdit();
         reloadData();
     };
 
