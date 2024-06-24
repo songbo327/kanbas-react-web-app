@@ -7,6 +7,11 @@ import * as client from "./client";
 import moment from "moment/moment";
 import QuestionEditor from "./QuestionEditor";
 import _ from "lodash";
+import {convertToRaw, EditorState, ContentState} from "draft-js";
+import {Editor} from 'react-draft-wysiwyg';
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+import draftToHtml from 'draftjs-to-html';
+import stateFromHTML from 'html-to-draftjs';
 
 export default function QuizzesEditor() {
     const {cid, qid} = useParams();
@@ -15,6 +20,18 @@ export default function QuizzesEditor() {
     const router = useNavigate();
 
     const aid = pathname.split("/").pop();
+
+    const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
+
+    const onEditorStateChange = (newEditorState: any) => {
+        setEditorState(newEditorState);
+        console.log(newEditorState)
+
+        const rawContent = draftToHtml(convertToRaw(editorState.getCurrentContent()));
+        console.log(rawContent)
+
+        setQuizz({...quizz, description: rawContent})
+    };
 
     const {quizzes} = useSelector((state: any) => state.quizzesReducer);
     const curQuizzes = quizzes.find((item: any) => item._id === aid);
@@ -34,6 +51,12 @@ export default function QuizzesEditor() {
     const fetchQuizzes = async () => {
         const quizze = await client.findQuizzesById(aid as string);
         setQuizz(quizze)
+
+        // fill content
+        const contentBlock = stateFromHTML(quizze.description);
+        const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
+        const newEditorState = EditorState.createWithContent(contentState);
+        setEditorState(newEditorState);
     };
 
     const handleChange = (e: any) => {
@@ -120,11 +143,19 @@ export default function QuizzesEditor() {
                                    onChange={handleChange}/>
                         </div>
 
-                        <div className="row input-group mb-2">
-                      <textarea id="wd-description" className="form-control" placeholder={"Enter Quizzes description"}
-                                rows={10} cols={60} name="description"
-                                onChange={handleChange} defaultValue={quizz?.description} value={quizz?.description}>
-                        </textarea>
+                        <div className="row input-group" style={{height: "200px",marginBottom:"100px"}}>
+                            <Editor
+                                editorState={editorState}
+                                onEditorStateChange={onEditorStateChange}
+                                placeholder={"Enter Quizzes description"}
+                                toolbar={{
+                                    options: ['inline', 'blockType', 'list', 'textAlign', 'history'],
+                                    inline: {inDropdown: true},
+                                    list: {inDropdown: true},
+                                    textAlign: {inDropdown: true},
+                                    history: {inDropdown: true},
+                                }}
+                            />
                         </div>
 
                         <div className="row mb-2">

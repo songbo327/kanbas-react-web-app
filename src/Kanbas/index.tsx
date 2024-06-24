@@ -16,11 +16,12 @@ import MyCourses from "./MyCourses";
 export default function Kanbas() {
     // const courses = db.courses;
     const [courses, setCourses] = useState<any[]>([]);
+    const {currentUser} = useSelector((state: any) => state.accountReducer);
 
     useEffect(() => {
         console.log("Fetching courses..")
         fetchCourses();
-    }, []);
+    }, [currentUser]);
 
     const [course, setCourse] = useState<any>({
         // _id: "0",
@@ -55,6 +56,7 @@ export default function Kanbas() {
 
     const fetchCourses = async () => {
         try {
+            setCourses([]); // reset data
             const courses = await client.fetchAllCourses();
             console.log("Courses fetched:", courses);
             setCourses(courses);
@@ -64,40 +66,38 @@ export default function Kanbas() {
     };
 
     return (
-        <Provider store={store}>
-            <div id="wd-kanbas" className="h-auto min-vh-100">
-                <div className="d-flex h-auto min-vh-100">
-                    <div className="d-none d-md-block bg-black">
-                        <KanbasNavigation/>
-                    </div>
-                    <div className="flex-fill p-4">
-                        <Routes>
-                            <Route path="/Account/*" element={<Account/>}/>
-                            <Route path="/" element={<Navigate to="Dashboard"/>}/>
-                            <Route path="Dashboard" element={<ProtectedRoute>
-                                <Dashboard
-                                    courses={courses}
-                                    course={course}
-                                    setCourse={setCourse}
-                                    addNewCourse={addNewCourse}
-                                    deleteCourse={deleteCourse}
-                                    updateCourse={updateCourse}/>
-                                <MyCourses/>
+        <div id="wd-kanbas" className="h-auto min-vh-100">
+            <div className="d-flex h-auto min-vh-100">
+                <div className="d-none d-md-block bg-black">
+                    <KanbasNavigation/>
+                </div>
+                <div className="flex-fill p-4">
+                    <Routes>
+                        <Route path="/Account/*" element={<Account/>}/>
+                        <Route path="/" element={<Navigate to="Dashboard"/>}/>
+                        <Route path="Dashboard" element={<ProtectedRoute>
+                            <Dashboard
+                                courses={courses}
+                                course={course}
+                                setCourse={setCourse}
+                                addNewCourse={addNewCourse}
+                                deleteCourse={deleteCourse}
+                                updateCourse={updateCourse}/>
+                            <MyCourses/>
+                        </ProtectedRoute>
+                        }/>
+                        <Route path="Courses/:cid/*" element={
+                            <ProtectedRoute>
+                                <Courses courses={courses}/>
+                                <Courses courses={courses}/>
                             </ProtectedRoute>
-                            }/>
-                            <Route path="Courses/:cid/*" element={
-                                <ProtectedRoute>
-                                    <Courses courses={courses}/>
-                                    <Courses courses={courses}/>
-                                </ProtectedRoute>
-                            }
-                            />
-                            <Route path="Calendar" element={<h1>Calendar</h1>}/>
-                            <Route path="Inbox" element={<h1>Inbox</h1>}/>
-                        </Routes>
-                    </div>
+                        }
+                        />
+                        <Route path="Calendar" element={<h1>Calendar</h1>}/>
+                        <Route path="Inbox" element={<h1>Inbox</h1>}/>
+                    </Routes>
                 </div>
             </div>
-        </Provider>
+        </div>
     )
 }

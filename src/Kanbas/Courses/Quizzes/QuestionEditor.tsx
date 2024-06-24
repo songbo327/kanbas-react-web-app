@@ -1,6 +1,11 @@
 import React, {useEffect, useState} from "react";
 import {useLocation, useParams} from "react-router";
 import * as client from "./client";
+import {convertToRaw, EditorState, ContentState} from "draft-js";
+import {Editor} from 'react-draft-wysiwyg';
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+import draftToHtml from 'draftjs-to-html';
+import stateFromHTML from 'html-to-draftjs';
 
 export default function QuestionEditor({closeEdit, questionData, reloadData}: {
     closeEdit: () => void;
@@ -11,10 +16,26 @@ export default function QuestionEditor({closeEdit, questionData, reloadData}: {
 
     const [question, setQuestion] = useState(questionData);
 
+    const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
+
+    const onEditorStateChange = (newEditorState: any) => {
+        setEditorState(newEditorState);
+        console.log(newEditorState)
+
+        const rawContent = draftToHtml(convertToRaw(editorState.getCurrentContent()));
+        console.log(rawContent)
+        setQuestion({...question, description: rawContent})
+    };
+
     // console.log(question)
 
     useEffect(() => {
         setQuestion(questionData);
+        // // fill content
+        const contentBlock = stateFromHTML(questionData.description);
+        const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
+        const newEditorState = EditorState.createWithContent(contentState);
+        setEditorState(newEditorState);
     }, [questionData]);
 
     const handleChange = (event: { target: { name: string; value: string; }; }) => {
@@ -28,7 +49,7 @@ export default function QuestionEditor({closeEdit, questionData, reloadData}: {
             setQuestion({
                 ...question,
                 [event.target.name]: event.target.value,
-                correctAnswer: '',
+                correctAnswer: 'True',
                 answers: ['True', 'False']
             });
         } else if (event.target.value === 'Multiple Choice') {
@@ -79,14 +100,26 @@ export default function QuestionEditor({closeEdit, questionData, reloadData}: {
                            onChange={handleChange}/>
                 </div>
 
-                <div className="row input-group mt-2 mb-2">
+                <div className="row input-group mt-2 mb-5">
                     <label htmlFor="wd-question-description" className="form-label">Description</label>
-                    <textarea id="wd-question-description" className="form-control"
-                              placeholder={"Enter question description"}
-                              rows={10} cols={60} name="description"
-                              onChange={handleChange} defaultValue={question?.description}
-                              value={question?.description}>
-                        </textarea>
+                    {/*<textarea id="wd-question-description" className="form-control"*/}
+                    {/*          placeholder={"Enter question description"}*/}
+                    {/*          rows={10} cols={60} name="description"*/}
+                    {/*          onChange={handleChange} defaultValue={question?.description}*/}
+                    {/*          value={question?.description}>*/}
+                    {/*    </textarea>*/}
+                    <Editor
+                        editorState={editorState}
+                        onEditorStateChange={onEditorStateChange}
+                        placeholder={"Enter question description"}
+                        toolbar={{
+                            options: ['inline', 'blockType', 'list', 'textAlign', 'history'],
+                            inline: {inDropdown: true},
+                            list: {inDropdown: true},
+                            textAlign: {inDropdown: true},
+                            history: {inDropdown: true},
+                        }}
+                    />
                 </div>
 
                 <div className="row input-group mt-2 mb-2">
